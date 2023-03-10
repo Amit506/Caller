@@ -21,18 +21,6 @@ Future<void> callerCallbackHandler(
   // );
   print(event);
   print(number);
-  switch (event) {
-    case CallerEvent.incoming:
-      print(
-          '[ Caller ] Incoming call ended, number: $number, duration $duration s');
-      break;
-    case CallerEvent.outgoing:
-      print(
-          '[ Caller ] Ougoing call ended, number: $number, duration: $duration s');
-      break;
-
-
-  }
 }
 
 void main() {

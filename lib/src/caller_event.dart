@@ -1,1 +1,1 @@
-enum CallerEvent { incoming, outgoing }
+enum CallerEvent { INCOMING, OUTGOING,INCOMING_ENDED,MISSED_CALL,OUTGOING_ENDED }

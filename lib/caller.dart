@@ -105,10 +105,19 @@ void _callbackDispatcher() {
     late CallerEvent callerEvent;
     switch (args.elementAt(2)) {
       case 'INCOMING':
-        callerEvent = CallerEvent.incoming;
+        callerEvent = CallerEvent.INCOMING;
         break;
       case 'OUTGOING':
-        callerEvent = CallerEvent.outgoing;
+        callerEvent = CallerEvent.OUTGOING;
+        break;
+      case 'INCOMING_ENDED':
+        callerEvent = CallerEvent.INCOMING_ENDED;
+        break;
+      case 'MISSED_CALL':
+        callerEvent = CallerEvent.MISSED_CALL;
+        break;
+      case 'OUTGOING_ENDED':
+        callerEvent = CallerEvent.OUTGOING_ENDED;
         break;
       default:
         throw Exception('Unkown event name');
