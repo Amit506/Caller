@@ -1,5 +1,7 @@
 import 'package:caller/caller.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 /// Defines a callback that will handle all background incoming events
 Future<void> callerCallbackHandler(
@@ -8,6 +10,17 @@ Future<void> callerCallbackHandler(
   int duration,
 ) async {
   print("New event received from native $event");
+  // Fluttertoast.showToast(
+  //     msg: "This is Center Short Toast",
+  //     toastLength: Toast.LENGTH_SHORT,
+  //     gravity: ToastGravity.CENTER,
+  //     timeInSecForIosWeb: 1,
+  //     backgroundColor: Colors.red,
+  //     textColor: Colors.white,
+  //     fontSize: 16.0
+  // );
+  print(event);
+  print(number);
   switch (event) {
     case CallerEvent.incoming:
       print(
@@ -17,6 +30,8 @@ Future<void> callerCallbackHandler(
       print(
           '[ Caller ] Ougoing call ended, number: $number, duration: $duration s');
       break;
+
+
   }
 }
 
@@ -77,6 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _startCaller() async {
+    Permission.phone.request();
     if (hasPermission != true) return;
     await Caller.initialize(callerCallbackHandler);
   }

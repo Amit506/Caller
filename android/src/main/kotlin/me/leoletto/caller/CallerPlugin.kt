@@ -3,16 +3,18 @@ package me.leoletto.caller
 import android.Manifest
 import android.app.Activity
 import android.content.ComponentName
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.FlutterPlugin.FlutterPluginBinding
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -53,14 +55,8 @@ class CallerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegi
       editor.putLong(CALLBACK_USER_SHAREDPREFERENCES_KEY, (arguments[1] as Long))
       editor.commit()
 
-      val context = currentActivity!!.applicationContext
-      val receiver = ComponentName(context, CallerPhoneServiceReceiver::class.java)
-      context.packageManager.setComponentEnabledSetting(receiver,
-              PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-              PackageManager.DONT_KILL_APP
-      )
       Log.d(PLUGIN_NAME, "Service initialized")
-      Log.d(PLUGIN_NAME, receiver.toString())
+
       result.success(true)
 
     } else if (call.method == "stopCaller") {
@@ -70,7 +66,7 @@ class CallerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegi
       editor.remove(CALLBACK_USER_SHAREDPREFERENCES_KEY)
       val context: Context = currentActivity!!.applicationContext
       val receiver = ComponentName(context, CallerPhoneServiceReceiver::class.java)
-        context.packageManager.setComponentEnabledSetting(receiver,
+       context.packageManager.setComponentEnabledSetting(receiver,
               PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
               PackageManager.DONT_KILL_APP
       )
@@ -99,8 +95,9 @@ class CallerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegi
     if (currentActivity != null && currentActivity!!.applicationContext != null) {
       val permPhoneState = ContextCompat.checkSelfPermission(currentActivity!!, Manifest.permission.READ_PHONE_STATE)
       val permReadCallLog = ContextCompat.checkSelfPermission(currentActivity!!, Manifest.permission.READ_CALL_LOG)
+      val permReadPhoneNumber = ContextCompat.checkSelfPermission(currentActivity!!, Manifest.permission.READ_PHONE_NUMBERS)
       val grantedCode = PackageManager.PERMISSION_GRANTED
-      return permPhoneState == grantedCode && permReadCallLog == grantedCode
+      return permPhoneState == grantedCode && permReadCallLog == grantedCode&&permReadPhoneNumber==grantedCode
     }
     return false
   }
@@ -113,7 +110,8 @@ class CallerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegi
 
     val permissions = arrayOf(
       Manifest.permission.READ_PHONE_STATE,
-      Manifest.permission.READ_CALL_LOG
+      Manifest.permission.READ_CALL_LOG,
+      Manifest.permission.READ_PHONE_NUMBERS
     )
     val permissionsToAsk = arrayListOf<String>()
 
@@ -144,13 +142,13 @@ class CallerPlugin : FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegi
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     currentActivity = binding.activity
     binding.addRequestPermissionsResultListener(this)
-    requestPermissions()
+//    requestPermissions()
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     currentActivity = binding.activity
     binding.addRequestPermissionsResultListener(this)
-    requestPermissions()
+//    requestPermissions()
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
